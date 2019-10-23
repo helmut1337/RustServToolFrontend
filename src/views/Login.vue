@@ -12,14 +12,14 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 </div>
-                                <input type="text" class="form-control" placeholder="username">
+                                <input type="text" class="form-control" placeholder="username" v-model="name" v-on:keypress.enter="login">
 
                             </div>
                             <div class="input-group form-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-key"></i></span>
                                 </div>
-                                <input type="password" class="form-control" placeholder="password">
+                                <input type="password" class="form-control" placeholder="password" v-model="password" v-on:keypress.enter="login">
                             </div>
                             <!--<div class="row align-items-center remember">
                                 <input type="checkbox">Remember Me
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <md-snackbar :md-position="position" :md-duration="snackbar.isInfinity ? Infinity : duration" :md-active.sync="snackbar.showSnackbar" md-persistent class="snackbar-bg-white">
+        <md-snackbar :md-position="snackbar.position" :md-duration="snackbar.isInfinity ? Infinity : snackbar.duration" :md-active.sync="snackbar.showSnackbar" md-persistent class="snackbar-bg-white">
             <span>{{snackbar.msg}}</span>
             <md-button class="md-primary" @click="snackbar.showSnackbar = false">Close</md-button>
         </md-snackbar>
@@ -57,6 +57,8 @@
         name: "Login",
         data() {
             return {
+                name: "",
+                password: "",
                 snackbar: {
                     msg: "Test",
                     showSnackbar: false,
@@ -64,13 +66,10 @@
                     duration: 4000,
                     isInfinity: false
                 }
-
-            };
+            }
         },
-        created() {
-            // alert(this.viewComponents[this.viewState]);
-            //this.login();
-
+        mounted() {
+            document.title = "Login - GoatRust";
         },
         computed: {
             ...mapGetters({
@@ -100,7 +99,9 @@
         methods: {
             ...mapActions({
                 login(dispatch) {
-                    let login = {name: 'admin', password: 'test'};
+                    //let login = {name: 'admin', password: 'test'};
+
+                    let login = {name: this.name, password: this.password};
                     dispatch('login', login)
                 },
                 auth(dispatch) {

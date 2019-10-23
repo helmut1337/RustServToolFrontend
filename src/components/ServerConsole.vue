@@ -1,10 +1,10 @@
 <template>
     <VueTerminal
-            :intro="intro"
-            console-sign="$"
+            console-sign=">"
             allow-arbitrary
             height="500px"
             @command="onCliCommand"
+            ref="terminal"
     ></VueTerminal>
 </template>
 
@@ -13,17 +13,31 @@
 
     export default {
         name: "App",
+        props: {
+            socket: {
+                type: WebSocket,
+                default: null
+            }
+        },
         data() {
             return {
-                intro: "Welcome to vue-terminal demo"
+
             };
         },
         methods: {
             onCliCommand(data, resolve, reject) {
+                const cmd = {'type': 'cmd', 'data': data.text};
+                this.socket.send(JSON.stringify(cmd));
                 console.log(data);
-                setTimeout(() => {
-                    resolve("");
-                }, 300);
+                resolve("");
+                /*setTimeout(() => {
+                    //resolve("");
+                    reject();
+                }, 300);*/
+            },
+
+            addInput: function(msg) {
+                this.$refs.terminal.addLine(msg);
             }
         },
         components: {

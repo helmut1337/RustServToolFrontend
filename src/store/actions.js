@@ -53,6 +53,16 @@ export const login = ({ commit }, payload) => {
   }, payload)
 };
 
+export const logout = ({ commit }) => {
+  commit('receiveLogin', {
+    loading: true,
+    //loggedIn: false
+  });
+  api.logout(data => {
+    commit('receiveLogin', data)
+  })
+};
+
 export const auth = ({ commit }) => {
   commit('receiveLogin', {
     loading: true,
