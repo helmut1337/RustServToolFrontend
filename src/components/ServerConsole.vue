@@ -26,7 +26,7 @@
         },
         methods: {
             onCliCommand(data, resolve, reject) {
-                const cmd = {'type': 'cmd', 'data': data.text};
+                const cmd = {'type': 1, 'body': data.text};
                 this.socket.send(JSON.stringify(cmd));
                 console.log(data);
                 resolve("");

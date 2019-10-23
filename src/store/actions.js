@@ -1,41 +1,5 @@
 import * as api from '../api'
-
-
-
-export const loadCalculatorWerkstuecke = ({ commit }) => {
-  commit('receiveCalculatorWerkstuecke', {
-    loading: true,
-    error: false,
-    data: []
-  });
-  api.fetchCalculatorWerkstuecke(data => {
-    commit('receiveCalculatorWerkstuecke', data)
-  })
-};
-
-export const loadCalculatorBasicData = ({ commit }) => {
-  commit('receiveCalculatorBasicData', {
-    loading: true,
-    error: false,
-    data: {}
-  });
-  //commit('receiveCalculatorBasicData', {});
-  api.fetchCalculatorBasicData(data => {
-    commit('receiveCalculatorBasicData', data)
-  })
-};
-
-export const requestWerkstueckPrice = ({ commit }, payload) => {
-  console.log("PAYLOAD", payload);
-  commit('receiveWerkstueckPrice', {
-    loading: true,
-    error: false,
-    data: {}
-  });
-  api.fetchWerkstueckPreis(data => {
-    commit('receiveWerkstueckPrice', data)
-  }, payload)
-};
+import initialDataState from './initialDataState'
 
 export const login = ({ commit }, payload) => {
   //let login = {name: 'admin', password: 'test'};
@@ -70,5 +34,46 @@ export const auth = ({ commit }) => {
   });
   api.auth(data => {
     commit('receiveLogin', data)
+  })
+};
+
+export const serverCMD_Start = ({ commit }) => {
+  commit('receiveServerCMD', {
+    ...initialDataState,
+    loading: true,
+    type: 'start'
+  });
+  api.serverCMD_Start(data => {
+    commit('receiveServerCMD', data)
+  })
+};
+
+export const serverCMD_Stop = ({ commit }) => {
+  commit('receiveServerCMD', {
+    loading: true,
+    type: 'stop'
+  });
+  api.serverCMD_Stop(data => {
+    commit('receiveServerCMD', data)
+  })
+};
+
+export const serverCMD_Restart = ({ commit }) => {
+  commit('receiveServerCMD', {
+    loading: true,
+    type: 'restart'
+  });
+  api.serverCMD_Restart(data => {
+    commit('receiveServerCMD', data)
+  })
+};
+
+export const serverCMD_Kill = ({ commit }) => {
+  commit('receiveServerCMD', {
+    loading: true,
+    type: 'kill'
+  });
+  api.serverCMD_Kill(data => {
+    commit('receiveServerCMD', data)
   })
 };

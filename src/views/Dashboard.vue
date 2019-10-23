@@ -25,12 +25,13 @@
             <div class="card">
                 <div class="card-header">
                     Actions
+                    <span class="float-right"><img v-if="requestedServerCMD.loading" src="../assets/loading_small.gif"></span>
                 </div>
                 <div class="card-body" style="text-align: center">
-                    <md-button v-on:click="serverStart" class="md-primary"><md-icon>play_arrow</md-icon>Start</md-button>
-                    <md-button v-on:click="serverRestart" class="md-primary"><md-icon>replay</md-icon>Restart</md-button>
-                    <md-button class="md-accent"><md-icon>stop</md-icon>Stop</md-button>
-                    <md-button class="md-accent"><md-icon>report</md-icon>Kill</md-button>
+                    <md-button :disabled="requestedServerCMD.loading" v-on:click="serverStart" class="md-primary"><md-icon>play_arrow</md-icon>Start</md-button>
+                    <md-button :disabled="requestedServerCMD.loading" v-on:click="serverRestart" class="md-primary"><md-icon>replay</md-icon>Restart</md-button>
+                    <md-button :disabled="requestedServerCMD.loading" v-on:click="serverStop" class="md-accent"><md-icon>stop</md-icon>Stop</md-button>
+                    <md-button :disabled="requestedServerCMD.loading" v-on:click="serverKill" class="md-accent"><md-icon>report</md-icon>Kill</md-button>
                 </div>
             </div>
             <br />
@@ -58,9 +59,11 @@
 
 <script>
     import { mapActions, mapGetters } from 'vuex'
+    import networkConfig from '../networkConfig'
     import ServerConsole from '../components/ServerConsole'
     import MemoryUsage from "../components/MemoryUsage";
     import router from "../router/index";
+    import store from '../store/index'
 
     export default {
         name: 'Dashboard',
@@ -110,9 +113,23 @@
 
                 // Init WebSocket with 500ms delay cwaiting for Console init
                 if(this.requestedLogin.loggedIn && this.webSocket === null) {
-                    setTimeout(function () {
+                   // setTimeout(function () {
                         this.initWebsocket();
-                    }.bind(this), 500);
+                   // }.bind(this), 500);
+                }
+            },
+            requestedServerCMD: function(newReqCMD) {
+                if(newReqCMD.done) {
+                    switch(newReqCMD.type) {
+                        case 'start':
+                            this.showSnackbar("Server started", 'success');
+                            break;
+
+                        case 'stop':
+                            this.showSnackbar("Server stopped", 'success');
+                            break;
+                    }
+                    store.commit('receiveServerCMD', {done: false, type: ""});
                 }
             }
         },
@@ -124,9 +141,15 @@
                 logout(dispatch) {
                     dispatch('logout');
                 },
+                serverCMD_Start(dispatch) {
+                    dispatch('serverCMD_Start');
+                },
+                serverCMD_Stop(dispatch) {
+                    dispatch('serverCMD_Stop');
+                },
             }),
             initWebsocket: function() {
-                this.webSocket = new WebSocket("ws://localhost:8180");
+                this.webSocket = new WebSocket(networkConfig.websocketUrl);
                 //let socket = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
 
                 this.webSocket.onopen = function(e) {
@@ -138,16 +161,18 @@
                 this.webSocket.onmessage = function(event) {
                     //alert(`[message] Data received from server: ${event.data}`);
                     let req = JSON.parse(event.data);
+                    console.log("recv websocker msg type: " + req.type)
                     switch(req.type){
-                        case "console":
-                            this.handleWebsocket_ConsoleInput(req.data);
+                        case 1:
+                        case 10:
+                            this.handleWebsocket_ConsoleInput(req.body);
                             break;
                     }
                 }.bind(this);
 
                 this.webSocket.onclose = function(event) {
                     if (!event.wasClean) {
-                        this.showSnackbar("WebSocket-Connection was lost");
+                        this.showSnackbar("WebSocket-Connection was lost", 'error');
                     }
                 }.bind(this);
 
@@ -190,18 +215,23 @@
                 this.snackbar.showSnackbar = true;
             },
             serverStart: function(){
-                this.showSnackbar("Server started", 'success');
+                this.serverCMD_Start();
             },
             serverRestart: function(){
                 this.showSnackbar("Server restarted", 'success');
             },
             serverStop: function(){
-                this.showSnackbar("Server stopped", 'success');
+                this.serverCMD_Stop();
+                //this.showSnackbar("Server stopped", 'success');
+            },
+            serverKill: function(){
+                this.showSnackbar("Server killed", 'success');
             }
         },
         computed: {
             ...mapGetters({
                 requestedLogin: 'requestedLogin',
+                requestedServerCMD: 'requestedServerCMD'
             }),
         },
     }

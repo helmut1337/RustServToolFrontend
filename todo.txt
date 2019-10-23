@@ -1,0 +1,4 @@
+todo:
+- inital states für jeden state anlegen
+- api calls auf neues error object umbauen
+- auth call auch im login screen und ggf. auf dashboard weiterleiten
