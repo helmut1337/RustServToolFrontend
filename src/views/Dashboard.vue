@@ -134,20 +134,12 @@
                    // }.bind(this), 500);
                 }
             },
-            /*requestedServerCMD: function(newReqCMD) {
-                if(newReqCMD.done) {
-                    switch(newReqCMD.type) {
-                        case 'start':
-                            this.showSnackbar("Server started", 'success');
-                            break;
-
-                        case 'stop':
-                            this.showSnackbar("Server stopped", 'success');
-                            break;
-                    }
-                    store.commit('receiveServerCMD', {done: false, type: ""});
+            requestedServerCMD: function(newReqCMD) {
+                if(newReqCMD.error || newReqCMD.networkError) {
+                    this.showSnackbar("Error requesting state change", 'error');
+                    store.commit('receiveServerCMD', {done: false, error: false, networkConfig: false});
                 }
-            }*/
+            }
         },
         methods: {
             ...mapActions({

@@ -26,9 +26,6 @@
                             </div>-->
                             <div class="form-group">
                                 <button v-on:click="login" class="btn float-right login_btn"><img v-if="requestedLogin.loading" src="../assets/loading_small.gif" class="login-btn-space"><i v-if="!requestedLogin.loading" class="login-btn-space fas fa-sign-in-alt"></i>Login</button>
-                                <!--
-                                <input @click="login" value="Login" class="btn float-right login_btn">
-                                <input @click="auth" value="Test" class="btn float-right login_btn">-->
                             </div>
                     </div>
                     <!--<div class="card-footer">
@@ -69,6 +66,7 @@
         },
         mounted() {
             document.title = "Login - GoatRust";
+            this.auth();
         },
         computed: {
             ...mapGetters({

@@ -83,7 +83,8 @@ export function auth(cb) {
             cb({
                 waiting: false,
                 loading: false,
-                loggedIn: false
+                loggedIn: false,
+                ...error.errorValues
             });
             return false;
         });
@@ -103,6 +104,7 @@ export function logout(cb) {
             cb({
                 waiting: false,
                 loading: false,
+                ...error.errorValues
             });
             return false;
         });

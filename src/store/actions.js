@@ -3,7 +3,6 @@ import initialDataState from './initialDataState'
 
 export const login = ({ commit }, payload) => {
   //let login = {name: 'admin', password: 'test'};
-  console.log("PAYLOAD", payload);
   commit('receiveLogin', {
     loading: true,
     waiting: true,
@@ -20,7 +19,6 @@ export const login = ({ commit }, payload) => {
 export const logout = ({ commit }) => {
   commit('receiveLogin', {
     loading: true,
-    //loggedIn: false
   });
   api.logout(data => {
     commit('receiveLogin', data)
@@ -30,7 +28,6 @@ export const logout = ({ commit }) => {
 export const auth = ({ commit }) => {
   commit('receiveLogin', {
     loading: true,
-    //loggedIn: false
   });
   api.auth(data => {
     commit('receiveLogin', data)
