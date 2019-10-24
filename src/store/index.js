@@ -17,7 +17,6 @@ const state = {
   },
   currentServerCMD: {
     ...initialDataState,
-    type: ""
   },
 };
 

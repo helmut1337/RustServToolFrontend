@@ -108,8 +108,8 @@ export function logout(cb) {
         });
 }
 
-export function serverCMD_Start(cb) {
-    axios.get(networkConfig.apiUrl +"/api/v1/management/start")
+export function serverCMD(cb, cmd) {
+    axios.get(networkConfig.apiUrl +"/api/v1/management/" + cmd)
         .then((response)  =>  {
             console.log("serverCMD_Start success");
             return cb({
@@ -122,33 +122,6 @@ export function serverCMD_Start(cb) {
             cb({
                 loading: false,
                 ...error.errorValues
-            });
-            return false;
-        });
-}
-
-export function serverCMD_Stop(cb) {
-    axios.get(networkConfig.apiUrl +"/api/v1/management/stop")
-        .then((response)  =>  {
-            console.log("serverCMD_Stop success");
-            return cb({
-                ...initialDataState,
-                done: true
-            });
-        }, (error)  => {
-            console.log("serverCMD_Stop failed", error);
-            let isError = false;
-            let networkError = false;
-            if (typeof error.response !== 'undefined') {
-                isError = true;
-            } else {
-                networkError = true;
-            }
-
-            cb({
-                loading: false,
-                networkError: networkError,
-                error: isError,
             });
             return false;
         });

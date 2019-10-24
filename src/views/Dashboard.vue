@@ -26,17 +26,19 @@
                 <div class="card-header">
                     Actions
                     <span class="float-right">
-                        <span v-if="socketValues.serverState === constants.STATE_STARTING">Server is starting...</span>
-                        <span v-if="socketValues.serverState === constants.STATE_STOPPING">Server is stopping...</span>
+                        <span v-if="socketValues.serverState === constants.STATE_STARTED" style="color: green"><md-icon style="color: green">play_arrow</md-icon>Running</span>
+                        <span v-if="socketValues.serverState === constants.STATE_STOPPED" style="color: red"><md-icon style="color: red">stop</md-icon>Stopped</span>
+                        <span v-if="socketValues.serverState === constants.STATE_STARTING"><md-icon>hourglass_empty</md-icon>Server is starting...</span>
+                        <span v-if="socketValues.serverState === constants.STATE_STOPPING"><md-icon>hourglass_empty</md-icon>Server is stopping...</span>
 
-                        <img v-if="serverStateLoading" src="../assets/loading_small.gif">
+                        <img v-if="serverStateLoading" src="../assets/loading_small.gif" style="margin-left: 20px;">
                     </span>
                 </div>
                 <div class="card-body" style="text-align: center">
-                    <md-button :disabled="requestedServerCMD.loading" v-on:click="serverStart" class="md-primary"><md-icon>play_arrow</md-icon>Start</md-button>
-                    <md-button :disabled="requestedServerCMD.loading" v-on:click="serverRestart" class="md-primary"><md-icon>replay</md-icon>Restart</md-button>
-                    <md-button :disabled="requestedServerCMD.loading" v-on:click="serverStop" class="md-accent"><md-icon>stop</md-icon>Stop</md-button>
-                    <md-button :disabled="requestedServerCMD.loading" v-on:click="serverKill" class="md-accent"><md-icon>report</md-icon>Kill</md-button>
+                    <md-button :disabled="serverStateLoading || socketValues.serverState === constants.STATE_STARTED" v-on:click="serverCMD('start')" class="md-primary"><md-icon>play_arrow</md-icon>Start</md-button>
+                    <md-button :disabled="serverStateLoading || socketValues.serverState === constants.STATE_STOPPED" v-on:click="serverCMD('restart')" class="md-primary"><md-icon>replay</md-icon>Restart</md-button>
+                    <md-button :disabled="serverStateLoading || socketValues.serverState === constants.STATE_STOPPED" v-on:click="serverCMD('stop')" class="md-accent"><md-icon>stop</md-icon>Stop</md-button>
+                    <!--<md-button :disabled="serverStateLoading" v-on:click="serverCMD('kill')" class="md-accent"><md-icon>report</md-icon>Kill</md-button>-->
                 </div>
             </div>
             <br />
@@ -69,11 +71,6 @@
     import MemoryUsage from "../components/MemoryUsage";
     import router from "../router/index";
     import store from '../store/index'
-
-    const STATE_STOPPED = 1;
-    const STATE_STARTED = 2;
-    const STATE_STARTING = 3;
-    const STATE_STOPPING = 4;
 
     export default {
         name: 'Dashboard',
@@ -137,7 +134,7 @@
                    // }.bind(this), 500);
                 }
             },
-            requestedServerCMD: function(newReqCMD) {
+            /*requestedServerCMD: function(newReqCMD) {
                 if(newReqCMD.done) {
                     switch(newReqCMD.type) {
                         case 'start':
@@ -150,7 +147,7 @@
                     }
                     store.commit('receiveServerCMD', {done: false, type: ""});
                 }
-            }
+            }*/
         },
         methods: {
             ...mapActions({
@@ -160,16 +157,12 @@
                 logout(dispatch) {
                     dispatch('logout');
                 },
-                serverCMD_Start(dispatch) {
-                    dispatch('serverCMD_Start');
-                },
-                serverCMD_Stop(dispatch) {
-                    dispatch('serverCMD_Stop');
+                serverCMD(dispatch, cmd) {
+                    dispatch('serverCMD', cmd);
                 },
             }),
             initWebsocket: function() {
                 this.webSocket = new WebSocket(networkConfig.websocketUrl);
-                //let socket = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
 
                 this.webSocket.onopen = function(e) {
                     /*alert("[open] Connection established");
@@ -189,8 +182,9 @@
 
                         case 2: // server state
                             console.log("New server state: " + req.body);
-                            this.socketValues.serverState = req.body;
+                            this.handleWebsocket_StateChange(req.body);
                             break;
+
                     }
                 }.bind(this);
 
@@ -201,7 +195,7 @@
                 }.bind(this);
 
                 this.webSocket.onerror = function(error) {
-                    //alert(`[error] ${error.message}`);
+                    this.showSnackbar("WebSocket error: "+error, 'error');
                 };
             },
             handleWebsocket_ConsoleInput: function(data) {
@@ -211,6 +205,22 @@
                 }, this);
 
             },
+            handleWebsocket_StateChange: function(data){
+
+                if(this.socketValues.serverState !== null)
+                {
+                    switch(data){
+                        case this.constants.STATE_STARTED:
+                            this.showSnackbar("Server started", 'success');
+                            break;
+
+                        case this.constants.STATE_STOPPED:
+                            this.showSnackbar("Server stopped", 'success');
+                            break;
+                    }
+                }
+                this.socketValues.serverState = data;
+            },
             addInputToConsole: function() {
                 this.$refs.console.addInput("lel");
             },
@@ -218,13 +228,11 @@
                 console.log("show snackbar");
                 this.snackbar.msg = msg;
 
-
                 for (let key in this.snackbar.classes){
                     if(this.snackbar.classes.hasOwnProperty(key)){
                         this.snackbar.classes[key] = false;
                     }
                 }
-
 
                 this.snackbar.classes["bg-green"] = false;
                 switch (color) {
@@ -238,19 +246,6 @@
                 }
                 this.snackbar.showSnackbar = true;
             },
-            serverStart: function(){
-                this.serverCMD_Start();
-            },
-            serverRestart: function(){
-                this.showSnackbar("Server restarted", 'success');
-            },
-            serverStop: function(){
-                this.serverCMD_Stop();
-                //this.showSnackbar("Server stopped", 'success');
-            },
-            serverKill: function(){
-                this.showSnackbar("Server killed", 'success');
-            }
         },
         computed: {
             ...mapGetters({

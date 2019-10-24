@@ -31,12 +31,11 @@
                                 <input @click="auth" value="Test" class="btn float-right login_btn">-->
                             </div>
                     </div>
-                    <div class="card-footer">
+                    <!--<div class="card-footer">
                         <div class="d-flex justify-content-center links">
                             Don't have an account? Fuck off
                         </div>
-
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>
@@ -139,7 +138,7 @@
     }
 
     .card{
-        height: 370px;
+        height: 300px;
         margin-top: auto;
         margin-bottom: auto;
         width: 400px;
