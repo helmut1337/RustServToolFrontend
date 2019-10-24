@@ -18,14 +18,19 @@
                    <!-- <ServerConsole ref="console" :socket="webSocket"></ServerConsole>-->
 
                     <ServerConsole ref="console" :socket="webSocket"></ServerConsole>
-                    <button v-on:click="addInputToConsole">Lel</button>
+                    <!--<button v-on:click="addInputToConsole">Lel</button>-->
                 </div>
             </div>
             <br />
             <div class="card">
                 <div class="card-header">
                     Actions
-                    <span class="float-right"><img v-if="requestedServerCMD.loading" src="../assets/loading_small.gif"></span>
+                    <span class="float-right">
+                        <span v-if="socketValues.serverState === constants.STATE_STARTING">Server is starting...</span>
+                        <span v-if="socketValues.serverState === constants.STATE_STOPPING">Server is stopping...</span>
+
+                        <img v-if="serverStateLoading" src="../assets/loading_small.gif">
+                    </span>
                 </div>
                 <div class="card-body" style="text-align: center">
                     <md-button :disabled="requestedServerCMD.loading" v-on:click="serverStart" class="md-primary"><md-icon>play_arrow</md-icon>Start</md-button>
@@ -65,6 +70,11 @@
     import router from "../router/index";
     import store from '../store/index'
 
+    const STATE_STOPPED = 1;
+    const STATE_STARTED = 2;
+    const STATE_STARTING = 3;
+    const STATE_STOPPING = 4;
+
     export default {
         name: 'Dashboard',
         components: {
@@ -73,8 +83,17 @@
         },
         data() {
           return {
+              constants: {
+                  STATE_STOPPED: 1,
+                  STATE_STARTED: 2,
+                  STATE_STARTING: 3,
+                  STATE_STOPPING: 4,
+              },
               authInterval: null,
               webSocket: null,
+              socketValues: {
+                  serverState: null
+              },
               snackbar: {
                   msg: "",
                   showSnackbar: false,
@@ -163,9 +182,14 @@
                     let req = JSON.parse(event.data);
                     console.log("recv websocker msg type: " + req.type)
                     switch(req.type){
-                        case 1:
-                        case 10:
+                        case 1: // Initial console history
+                        case 10: // new console line
                             this.handleWebsocket_ConsoleInput(req.body);
+                            break;
+
+                        case 2: // server state
+                            console.log("New server state: " + req.body);
+                            this.socketValues.serverState = req.body;
                             break;
                     }
                 }.bind(this);
@@ -233,6 +257,9 @@
                 requestedLogin: 'requestedLogin',
                 requestedServerCMD: 'requestedServerCMD'
             }),
+            serverStateLoading() {
+                return this.socketValues.serverState === this.constants.STATE_STARTING || this.socketValues.serverState === this.constants.STATE_STOPPING || this.requestedServerCMD.loading;
+            }
         },
     }
 </script>

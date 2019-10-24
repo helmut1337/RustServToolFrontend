@@ -38,7 +38,7 @@ axios.interceptors.response.use(function (response) {
 
 
 export function login(cb, login) {
-    axios.post(networkConfig.apiUrl +"/login", login)
+    axios.post(networkConfig.apiUrl +"/api/v1/login", login)
         .then((response)  =>  {
             console.log("login success");
             return cb({
@@ -70,7 +70,7 @@ export function login(cb, login) {
 }
 
 export function auth(cb) {
-    axios.get(networkConfig.apiUrl +"/auth", )
+    axios.get(networkConfig.apiUrl +"/api/v1/auth", )
         .then((response)  =>  {
             console.log("auth success");
             return cb({
@@ -90,7 +90,7 @@ export function auth(cb) {
 }
 
 export function logout(cb) {
-    axios.get(networkConfig.apiUrl +"/logout", )
+    axios.get(networkConfig.apiUrl +"/api/v1/logout", )
         .then((response)  =>  {
             console.log("logout success");
             return cb({
@@ -118,18 +118,10 @@ export function serverCMD_Start(cb) {
             });
         }, (error)  => {
             console.log("serverCMD_Start failed", error);
-            let isError = false;
-            let networkError = false;
-            if (typeof error.response !== 'undefined') {
-                isError = true;
-            } else {
-                networkError = true;
-            }
 
             cb({
                 loading: false,
-                networkError: networkError,
-                error: isError,
+                ...error.errorValues
             });
             return false;
         });
