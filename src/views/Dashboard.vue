@@ -66,7 +66,7 @@
 
 <script>
     import { mapActions, mapGetters } from 'vuex'
-    import networkConfig from '../networkConfig'
+    import config from '../config'
     import ServerConsole from '../components/ServerConsole'
     import MemoryUsage from "../components/MemoryUsage";
     import router from "../router/index";
@@ -105,7 +105,7 @@
           }
         },
         mounted() {
-            document.title = "Dashboard - GoatRust";
+            document.title = "Dashboard - " + config.serverName;
             this.auth();
 
             // Re-Auth every 10 seconds
@@ -137,7 +137,7 @@
             requestedServerCMD: function(newReqCMD) {
                 if(newReqCMD.error || newReqCMD.networkError) {
                     this.showSnackbar("Error requesting state change", 'error');
-                    store.commit('receiveServerCMD', {done: false, error: false, networkConfig: false});
+                    store.commit('receiveServerCMD', {done: false, error: false, networkError: false});
                 }
             }
         },
@@ -154,7 +154,7 @@
                 },
             }),
             initWebsocket: function() {
-                this.webSocket = new WebSocket(networkConfig.websocketUrl);
+                this.webSocket = new WebSocket(config.websocketUrl);
 
                 this.webSocket.onopen = function(e) {
                     /*alert("[open] Connection established");

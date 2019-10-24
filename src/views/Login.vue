@@ -47,6 +47,7 @@
 
 <script>
     import { mapActions, mapGetters } from 'vuex'
+    import config from '../config'
     import router from "../router/index";
     export default {
 
@@ -65,7 +66,7 @@
             }
         },
         mounted() {
-            document.title = "Login - GoatRust";
+            document.title = "Login - " + config.serverName;
             this.auth();
         },
         computed: {

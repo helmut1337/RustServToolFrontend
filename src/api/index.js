@@ -2,7 +2,7 @@ import axios from 'axios'
 import initialDataState from '../store/initialDataState'
 import store from '../store/index'
 
-import networkConfig from '../networkConfig'
+import networkConfig from '../config'
 axios.defaults.withCredentials = true;
 axios.defaults.timeout = 2000;
 
