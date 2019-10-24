@@ -2,7 +2,7 @@
     <VueTerminal
             console-sign=">"
             allow-arbitrary
-            height="500px"
+            height="400px"
             @command="onCliCommand"
             ref="terminal"
     ></VueTerminal>
